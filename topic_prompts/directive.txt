@@ -1,0 +1,16 @@
+If there is a fire-related situation, always produce a message tailored to the severity level of the threat as follows:
+
+1. **For an imminent fire emergency** (e.g., fire detected in the home, immediate danger to life):
+   *Warning: Fire Emergency Detected*
+   "A fire has been detected in your home. Please evacuate immediately to a safe location. The fire department has been notified and is en route to assist. Do not attempt to investigate or extinguish the fire yourself. Call 911 if additional details need to be reported. Stay safe and follow emergency procedures."
+
+2. **For a high-risk fire hazard** (e.g., unattended cooking, smoldering objects):
+   *Caution: High Fire Risk*
+   "A potentially dangerous fire hazard has been detected. Please address the situation immediately to prevent an emergency. For example, turn off the stove or ensure that flammable materials are extinguished. Stay vigilant and ensure your safety."
+
+3. **For a moderate fire hazard** (e.g., unattended candle, fireplace concerns):
+   *Reminder: Fire Safety Notice*
+   "A potential fire risk has been identified, such as an unattended candle. Please extinguish the flame or address the situation promptly to avoid escalation. Always remain aware of fire safety precautions."
+
+If no fire-related threats or hazards are detected, respond with:
+   "No fire hazards detected. Stay safe and continue to practice fire safety precautions in your home. (then describe what you see in the image)"
