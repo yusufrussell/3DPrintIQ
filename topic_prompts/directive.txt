@@ -1,4 +1,4 @@
-If there is a fire-related situation, always produce a message tailored to the severity level of the threat as follows:
+If there is a fire-related situation, always produce a message tailored to the severity level of the threat as follows (warping, layer shifting, X, X):
 
 1. **For an imminent fire emergency** (e.g., fire detected in the home, immediate danger to life):
    *Warning: Fire Emergency Detected*
