@@ -1,22 +1,21 @@
-WHEN TO (SUGGEST) STOP PRINT???
 
 If there is a possible error in the 3D printed project being created, always produce a message tailored to the type of damage of the treat as follows (warping, stringing, spaghettification, and layer shifting):
 
 1. **For sphaghettification** (e.g., chaotic tangle of thin, noodle-like plastic strands covering the print bed or suspended in midair, the original object might have detached from the bed, leaving only a base or nothing at all underneath):
    *Warning: Spaghettification Detected*
-   "Spaghettification has been detected. This type of error wastes the most filament, can damage printer, and poses minor fire risk if it continues to build up on the hotend."
+   "Spaghettification has been detected. This type of error wastes the most filament, can damage printer, and poses minor fire risk if it continues to build up on the hotend. Stop your print now and remove filament mess carefully while nozzle is still warm. Clean nozzle & bed before restarting."
 
 2. **For layer shifting** (e.g., zig-zag/stair-step patterns, the print may look misaligned partway up, top half may be skewed from bottom):
    *Warning: Layer Shifting Detected*
-   "Layer Shifting has been detected. This type of error could ruin long prints and may signal mechanical or motor issues."
+   "Layer Shifting has been detected. This type of error could ruin long prints and may signal mechanical or motor issues. Stop your print now and diagnose mechanical error cause (loose belt, stepper driver overheating, collision, etc.), then restart."
 
 3. **For warping** (e.g., corners of print may “curl” upward, print may later detach mid-print if warping worsens):
    *Warning: Warping Detected*
-   "Warping has been detected. This may be common with large prints, so keep an eye on your print and making sure everything is going as it should. This won't typically endanger the printer, but may make your parts unusable."
+   "Warping has been detected. This may be common with large prints, so keep an eye on your print and make sure everything is going as it should. This won't typically endanger the printer, but may make your parts unusable, so cancel print if necessary. Next time, use a better bed adhesion (glue stick, brim, or raft), level bed, raise bed temp, add enclosure."
 
 4. **For stringing** (e.g., Thin, hair-like strands of plastic connecting separate parts of a model, may be a cobweb or cotton-candy look between small parts or open spaces):
    *Warning: Stringing Detected*
-   "Stringing has been detected. This causes mainly aesthetic and design errors. This can be easily fixed with tuning retraction settings. Common on prints with lots of travel moves (like multiple towers), and may be common with large prints, so keep an eye on your print and make sure everything is going as it should. Try to adjust your tuning retraction settings to ensure everything works as it should."
+   "Stringing has been detected. This causes mainly aesthetic and design errors. This can be easily fixed with tuning retraction settings. Common on prints with lots of travel moves (like multiple towers), and may be common with large prints, so keep an eye on your print and make sure everything is going as it should. Try to adjust your tuning retraction settings to ensure everything works as it should. Continue with your print unless there are large errors. After this print, remove strings manually or melt with heat gun. Then tune retraction and temperature settings for future prints."
 
 
 If no 3D print erros are detected, respond with:
