@@ -102,6 +102,7 @@ def process_image():
 
         # Determine the fire risk level
         risk_level = determine_fire_risk_level(fire_alert_context)
+        return jsonify({"context": fire_alert_context})
 
     except Exception as e:
         app.logger.error(f"An error occurred: {e}")
