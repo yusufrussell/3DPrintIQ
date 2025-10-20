@@ -24,7 +24,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-openai.api_key = "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"
+openai.api_key = "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"
 app.secret_key = "supersecretkey"
 
 # Twilio credentials 
@@ -38,19 +38,19 @@ with open("topic_prompts/directive.txt", "r") as file:
     additional_context = file.read()
 
 # Function to extract context from the assistant's response
-def extract_fire_alert_from_response(response_text):
+def extract_error_alert_from_response(response_text):
     return response_text.strip()
 
-# Function to determine the fire risk level from the assistant's response
-def determine_fire_risk_level(fire_alert_context):
-    if "Warning: Fire Emergency Detected" in fire_alert_context:
-        return "imminent fire emergency"
-    elif "Caution: High Fire Risk" in fire_alert_context:
-        return "high-risk fire hazard"
-    elif "Reminder: Fire Safety Notice" in fire_alert_context:
-        return "moderate fire hazard"
+# Function to determine the error risk level from the assistant's response
+def determine_error_risk_level(error_alert_context):
+    if "Warning: Spaghettification Detected" in error_alert_context or "Warning: Layer Shifting Detected" in error_alert_context:
+        return "imminent error emergency"
+    elif "Caution: Warping Detected" in error_alert_context:
+        return "high-risk error hazard"
+    elif "Reminder: Stringing Detected" in error_alert_context:
+        return "moderate error hazard"
     else:
-        return "no fire hazard"
+        return "no error hazard"
 
 # Function to send SMS via Twilio
 def send_sms_via_twilio(to_number, from_number, body):
@@ -95,7 +95,7 @@ def process_image():
                 {
                     "type": "text",
                     "text": (
-                        f"You create fire risk messages based on the context you get from images taken from camera feeds, ensuring tailored warnings and guidance for users depending on the severity of the situation. "
+                        f"You create 3D print error messages based on the context you get from images taken from camera feeds, ensuring tailored warnings and guidance for users depending on the severity of the situation. "
                         f"Use the following context to guide your response:\n\n{additional_context}"
                     )
                 },
@@ -117,25 +117,25 @@ def process_image():
         # Extract the assistant's response
         gpt_response = response.choices[0].message.content
 
-        # Extract fire alert context from the response
-        fire_alert_context = extract_fire_alert_from_response(gpt_response)
+        # Extract 3D printed error alert context from the response
+        error_alert_context = extract_error_alert_from_response(gpt_response)
 
         # Store context in the session
-        session["fire_alert_context"] = fire_alert_context
+        session["error_alert_context"] = error_alert_context
 
-        # Determine the fire risk level
-        risk_level = determine_fire_risk_level(fire_alert_context)
+        # Determine the error risk level
+        risk_level = determine_error_risk_level(error_alert_context)
 
         # Decide whether to send SMS
-        if risk_level in ["imminent fire emergency", "high-risk fire hazard", "moderate fire hazard"]:
+        if risk_level in ["imminent error emergency", "high-risk error hazard", "moderate error hazard"]:
             # Send SMS
             send_sms_via_twilio(
                 to_number=user_phone_number,
                 from_number=twilio_phone_number,
-                body=fire_alert_context
+                body=error_alert_context
             )
 
-        return jsonify({"context": fire_alert_context})
+        return jsonify({"context": error_alert_context})
     except Exception as e:
         app.logger.error(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
