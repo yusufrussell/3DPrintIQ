@@ -14,7 +14,7 @@ import os
 import base64
 import re
 import requests
-
+from dotenv import load_dotenv
 from twilio.rest import Client  
 
 app = Flask(__name__)
@@ -24,14 +24,15 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-openai.api_key = "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"
+load_dotenv()
+api_key=os.getenv("OPENAI_API_KEY")
 app.secret_key = "supersecretkey"
 
 # Twilio credentials 
 account_sid = "ACe9e96fffa3a05bff45cd3c9749d73427"
 auth_token = "b45a3727d3e2b7ea6fb54811b6854e6e"
 twilio_phone_number = "+18557270309"  # Your Twilio phone number
-user_phone_number = "+17374020057"    # The user's phone number for testing
+user_phone_number = "+15129778085"    # The user's phone number for testing
 
 # Open and read txt file, create variable for the contents
 with open("topic_prompts/directive.txt", "r") as file:
