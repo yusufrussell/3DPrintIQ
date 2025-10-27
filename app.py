@@ -14,7 +14,7 @@ import os
 import base64
 import re
 import requests
-
+from dotenv import load_dotenv
 from twilio.rest import Client  
 
 app = Flask(__name__)
@@ -24,7 +24,8 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-openai.api_key = "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"
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 app.secret_key = "supersecretkey"
 
 # Twilio credentials 

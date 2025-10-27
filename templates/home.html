@@ -2,21 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home Fire Monitoring System</title>
+    <title>3DPrintIQ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Link to the updated CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
     <header>
-        <h1>Home Fire Monitoring System</h1>
+        <h1>3DPrintIQ</h1>
     </header>
 
     <main>
         <section id="monitoring-section">
             <div id="webcam-container">
                 <video id="camera-feed" autoplay muted playsinline></video>
-                <button id="analyze-button">Scan for Fire</button>
+                <button id="analyze-button">Emergency Stop</button>
+                <button class="toggle-button" id="myToggleButton">Detect Errors</button>
             </div>
             <div id="logs-container">
                 <h2>Detection Logs</h2>
@@ -26,7 +27,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2023 FireGuard Inc.</p>
+        <p>&copy; 2025 3DPrintIQ Inc.</p>
     </footer>
 
     <!-- Link to the updated JavaScript file -->
