@@ -14,8 +14,14 @@ import os
 import base64
 import re
 import requests
+import discord
+from discord.ext import commands
+import logging
 from dotenv import load_dotenv
-from twilio.rest import Client  
+import asyncio # For Discord bot
+import threading
+
+discord_alert_queue = asyncio.Queue()
 
 app = Flask(__name__)
 
@@ -25,14 +31,63 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 load_dotenv()
-api_key=os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
 app.secret_key = "supersecretkey"
+token = os.getenv("DISCORD_TOKEN")
+channel_id = os.getenv("CHANNEL_ID")
 
-# Twilio credentials 
-account_sid = "ACe9e96fffa3a05bff45cd3c9749d73427"
-auth_token = "b45a3727d3e2b7ea6fb54811b6854e6e"
-twilio_phone_number = "+18557270309"  # Your Twilio phone number
-user_phone_number = "+15129778085"    # The user's phone number for testing
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+"""
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    fire_alert_context = message.content
+    risk_level = determine_fire_risk_level(fire_alert_context)
+
+    if risk_level != "not fire hazard":
+        await message.channel.send(f"Alert: Detected a {risk_level}. Please take necessary precautions.")
+
+    await bot.process_commands(message)
+"""
+# Bot setup
+@bot.event
+async def on_ready():
+    print(f"Logged in as {bot.user} (ID: {bot.user.name})")
+    bot.loop.create_task(discord_alert())
+
+async def discord_alert():
+    await bot.wait_until_ready()
+    channel = bot.get_channel(int(channel_id))
+    print(f"[🔊🔊🔊] Found channel: {channel}")
+    while not bot.is_closed():
+        item = await discord_alert_queue.get()
+        if isinstance(item, tuple) and len(item) == 2:
+            message, level = item
+        else:
+            message = item
+        if level == "danger":
+            embed = discord.Embed(title="Fire Alert", description=message, color=0xFF0000)
+        elif level == "warning":
+            embed = discord.Embed(title="Fire Warning", description=message, color=0xFFA500)
+        else:
+            embed = discord.Embed(title="Fire Notice", description=message, color=0xFFFF00)
+        await channel.send(embed=embed)
+        discord_alert_queue.task_done()
+
+def start_discord_bot():
+    async def runner():
+        await bot.start(token)
+
+    def thread_target():
+        asyncio.run(runner())
+
+    threading.Thread(target=thread_target, daemon=True).start()
 
 # Open and read txt file, create variable for the contents
 with open("topic_prompts/directive.txt", "r") as file:
@@ -52,22 +107,6 @@ def determine_error_risk_level(error_alert_context):
         return "moderate error hazard"
     else:
         return "no error hazard"
-
-# Function to send SMS via Twilio
-def send_sms_via_twilio(to_number, from_number, body):
-    url = f'https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json'
-    data = {
-        'To': to_number,
-        'From': from_number,
-        'Body': body
-    }
-    try:
-        response = requests.post(url, data=data, auth=(account_sid, auth_token))
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        app.logger.info(f"SMS sent: {response.json()['sid']}")
-    except requests.exceptions.RequestException as e:
-        app.logger.error(f"An error occurred while sending SMS: {e}")
-
 
 @app.route("/")
 def home():
@@ -124,19 +163,23 @@ def process_image():
         # Store context in the session
         session["error_alert_context"] = error_alert_context
 
-        # Determine the error risk level
-        risk_level = determine_error_risk_level(error_alert_context)
+        # Determine the fire risk level
+        risk_level = determine_fire_risk_level(fire_alert_context)
+        print(f"[🔥🔥🔥] Risk level determined: {risk_level}")
 
-        # Decide whether to send SMS
-        if risk_level in ["imminent error emergency", "high-risk error hazard", "moderate error hazard"]:
-            # Send SMS
-            send_sms_via_twilio(
-                to_number=user_phone_number,
-                from_number=twilio_phone_number,
-                body=error_alert_context
-            )
+        # Create discord message
+        if risk_level != "no fire hazard":
+            discord_message = f"Alert: Detected a {risk_level}. Please take necessary precautions."
+            if "imminent" in risk_level:
+                level = "danger"
+            elif "high" in risk_level:
+                level = "warning"
+            else:
+                level = "notice"
+            asyncio.run_coroutine_threadsafe(discord_alert_queue.put((discord_message, level)), bot.loop)
 
-        return jsonify({"context": error_alert_context})
+        return jsonify({"context": fire_alert_context, "risk_level": risk_level})
+
     except Exception as e:
         app.logger.error(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
@@ -149,4 +192,5 @@ def clear_session():
     return jsonify({"status": "session cleared"})
 
 if __name__ == "__main__":
+    start_discord_bot()
     app.run(debug=True, port=8080)
