@@ -14,12 +14,15 @@ import os
 import base64
 import re
 import requests
-import discord
-from discord.ext import commands
 import logging
 from dotenv import load_dotenv
-import asyncio # For Discord bot
+
+# For Discord bot
+import discord
+from discord.ext import commands
+import asyncio 
 import threading
+import io
 
 discord_alert_queue = asyncio.Queue()
 
@@ -41,26 +44,14 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
-"""
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
 
-    fire_alert_context = message.content
-    risk_level = determine_fire_risk_level(fire_alert_context)
-
-    if risk_level != "not fire hazard":
-        await message.channel.send(f"Alert: Detected a {risk_level}. Please take necessary precautions.")
-
-    await bot.process_commands(message)
-"""
 # Bot setup
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.name})")
     bot.loop.create_task(discord_alert())
 
+# Create Discord alert
 async def discord_alert():
     await bot.wait_until_ready()
     channel = bot.get_channel(int(channel_id))
@@ -73,13 +64,17 @@ async def discord_alert():
             message = item
         if level == "danger":
             embed = discord.Embed(title="Fire Alert", description=message, color=0xFF0000)
+            embed.set_image(url="attachment://fire_detection.jpg")
         elif level == "warning":
             embed = discord.Embed(title="Fire Warning", description=message, color=0xFFA500)
+            embed.set_image(url="attachment://fire_detection.jpg")
         else:
             embed = discord.Embed(title="Fire Notice", description=message, color=0xFFFF00)
-        await channel.send(embed=embed)
+            embed.set_image(url="attachment://fire_detection.jpg")
+        await channel.send(embed=embed, file=discord_image_file)
         discord_alert_queue.task_done()
 
+# Start bot in seperate thread
 def start_discord_bot():
     async def runner():
         await bot.start(token)
@@ -126,6 +121,14 @@ def process_image():
 
     # Prepare the image data for the OpenAI API
     image_url = f"data:image/jpeg;base64,{image_base64}"
+
+    # Create a file-like object for Discord
+    image_bytes = base64.b64decode(image_base64)
+    image_mem_file = io.BytesIO(image_bytes)
+    global discord_image_file
+    discord_image_file = discord.File(fp=image_mem_file, filename="fire_detection.jpg")
+    discord_image_file_embed = discord.Embed(title="Captured Image", description="Image captured from camera feed.")
+    discord_image_file_embed.set_image(url="attachment://fire_detection.jpg")
 
     # Construct the messages as per OpenAI's vision API
     messages = [
