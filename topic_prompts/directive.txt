@@ -1,16 +1,22 @@
-If there is a fire-related situation, always produce a message tailored to the severity level of the threat as follows:
 
-1. **For an imminent fire emergency** (e.g., fire detected in the home, immediate danger to life):
-   *Warning: Fire Emergency Detected*
-   "A fire has been detected in your home. Please evacuate immediately to a safe location. The fire department has been notified and is en route to assist. Do not attempt to investigate or extinguish the fire yourself. Call 911 if additional details need to be reported. Stay safe and follow emergency procedures."
+If there is a possible error in the 3D printed project being created, always produce a message tailored to the type of damage of the treat as follows (warping, stringing, spaghettification, and layer shifting):
 
-2. **For a high-risk fire hazard** (e.g., unattended cooking, smoldering objects):
-   *Caution: High Fire Risk*
-   "A potentially dangerous fire hazard has been detected. Please address the situation immediately to prevent an emergency. For example, turn off the stove or ensure that flammable materials are extinguished. Stay vigilant and ensure your safety."
+1. **For sphaghettification** (e.g., chaotic tangle of thin, noodle-like plastic strands covering the print bed or suspended in midair, the original object might have detached from the bed, leaving only a base or nothing at all underneath):
+   *Warning: Spaghettification Detected*
+   "Spaghettification has been detected. This type of error wastes the most filament, can damage printer, and poses minor fire risk if it continues to build up on the hotend. Stop your print now and remove filament mess carefully while nozzle is still warm. Clean nozzle & bed before restarting."
 
-3. **For a moderate fire hazard** (e.g., unattended candle, fireplace concerns):
-   *Reminder: Fire Safety Notice*
-   "A potential fire risk has been identified, such as an unattended candle. Please extinguish the flame or address the situation promptly to avoid escalation. Always remain aware of fire safety precautions."
+2. **For layer shifting** (e.g., zig-zag/stair-step patterns, the print may look misaligned partway up, top half may be skewed from bottom):
+   *Warning: Layer Shifting Detected*
+   "Layer Shifting has been detected. This type of error could ruin long prints and may signal mechanical or motor issues. Stop your print now and diagnose mechanical error cause (loose belt, stepper driver overheating, collision, etc.), then restart."
 
-If no fire-related threats or hazards are detected, respond with:
-   "No fire hazards detected. Stay safe and continue to practice fire safety precautions in your home. (then describe what you see in the image)"
+3. **For warping** (e.g., corners of print may “curl” upward, print may later detach mid-print if warping worsens):
+   *Warning: Warping Detected*
+   "Warping has been detected. This may be common with large prints, so keep an eye on your print and make sure everything is going as it should. This won't typically endanger the printer, but may make your parts unusable, so cancel print if necessary. Next time, use a better bed adhesion (glue stick, brim, or raft), level bed, raise bed temp, add enclosure."
+
+4. **For stringing** (e.g., Thin, hair-like strands of plastic connecting separate parts of a model, may be a cobweb or cotton-candy look between small parts or open spaces):
+   *Warning: Stringing Detected*
+   "Stringing has been detected. This causes mainly aesthetic and design errors. This can be easily fixed with tuning retraction settings. Common on prints with lots of travel moves (like multiple towers), and may be common with large prints, so keep an eye on your print and make sure everything is going as it should. Try to adjust your tuning retraction settings to ensure everything works as it should. Continue with your print unless there are large errors. After this print, remove strings manually or melt with heat gun. Then tune retraction and temperature settings for future prints."
+
+
+If no 3D print erros are detected, respond with:
+   "No 3D print errors detected. (then describe what you see in the image)"

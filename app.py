@@ -89,19 +89,19 @@ with open("topic_prompts/directive.txt", "r") as file:
     additional_context = file.read()
 
 # Function to extract context from the assistant's response
-def extract_fire_alert_from_response(response_text):
+def extract_error_alert_from_response(response_text):
     return response_text.strip()
 
-# Function to determine the fire risk level from the assistant's response
-def determine_fire_risk_level(fire_alert_context):
-    if "Warning: Fire Emergency Detected" in fire_alert_context:
-        return "imminent fire emergency"
-    elif "Caution: High Fire Risk" in fire_alert_context:
-        return "high-risk fire hazard"
-    elif "Reminder: Fire Safety Notice" in fire_alert_context:
-        return "moderate fire hazard"
+# Function to determine the error risk level from the assistant's response
+def determine_error_risk_level(error_alert_context):
+    if "Warning: Spaghettification Detected" in error_alert_context or "Warning: Layer Shifting Detected" in error_alert_context:
+        return "imminent error emergency"
+    elif "Caution: Warping Detected" in error_alert_context:
+        return "high-risk error hazard"
+    elif "Reminder: Stringing Detected" in error_alert_context:
+        return "moderate error hazard"
     else:
-        return "no fire hazard"
+        return "no error hazard"
 
 @app.route("/")
 def home():
@@ -138,7 +138,7 @@ def process_image():
                 {
                     "type": "text",
                     "text": (
-                        f"You create fire risk messages based on the context you get from images taken from camera feeds, ensuring tailored warnings and guidance for users depending on the severity of the situation. "
+                        f"You create 3D print error messages based on the context you get from images taken from camera feeds, ensuring tailored warnings and guidance for users depending on the severity of the situation. "
                         f"Use the following context to guide your response:\n\n{additional_context}"
                     )
                 },
@@ -160,11 +160,11 @@ def process_image():
         # Extract the assistant's response
         gpt_response = response.choices[0].message.content
 
-        # Extract fire alert context from the response
-        fire_alert_context = extract_fire_alert_from_response(gpt_response)
+        # Extract 3D printed error alert context from the response
+        error_alert_context = extract_error_alert_from_response(gpt_response)
 
         # Store context in the session
-        session["fire_alert_context"] = fire_alert_context
+        session["error_alert_context"] = error_alert_context
 
         # Determine the fire risk level
         risk_level = determine_fire_risk_level(fire_alert_context)
