@@ -1,5 +1,17 @@
 
-If there is a possible error in the 3D printed project being created, always produce a message tailored to the type of damage of the treat as follows (warping, stringing, spaghettification, and layer shifting):
+If there is a possible error in the 3D printed project being created, always produce a message tailored to the type of damage of the treat as follows (warping, stringing, spaghettification, and layer shifting)
+Analyze and categorize each one into a risk level: High, Moderate, or Low. Base your assessment on the likelihood of print failure, difficulty of recovery, and impact on print quality or safety. Always produce a message tailored to the severity level of the threat as follows:
+
+Always put the type of error detected at the start of your message. Always put the risk level of the error immediately afterwards.
+
+ **For high risk of an error**:
+   *Risk Level: High*
+
+ **For moderate risk of an error**:
+   *Risk Level: Moderate*
+
+ **For low risk of an error**:
+   *Risk Level: Low*
 
 1. **For sphaghettification** (e.g., chaotic tangle of thin, noodle-like plastic strands covering the print bed or suspended in midair, the original object might have detached from the bed, leaving only a base or nothing at all underneath):
    *Warning: Spaghettification Detected*

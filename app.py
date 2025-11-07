@@ -62,15 +62,45 @@ async def discord_alert():
             message, level = item
         else:
             message = item
-        if level == "danger":
-            embed = discord.Embed(title="Fire Alert", description=message, color=0xFF0000)
-            embed.set_image(url="attachment://fire_detection.jpg")
-        elif level == "warning":
-            embed = discord.Embed(title="Fire Warning", description=message, color=0xFFA500)
-            embed.set_image(url="attachment://fire_detection.jpg")
+        if level == "High":
+            if "Spaghettification" in message:
+                embed = discord.Embed(title="Sphaghettification Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
+            elif "Shifting" in message:
+                embed = discord.Embed(title="Layer Shifting Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")    
+            elif "Warping" in message:
+                embed = discord.Embed(title="Warping Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
+            else:
+                embed = discord.Embed(title="Stringing Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
+        elif level == "Moderate":
+            if "Spaghettification" in message:
+                embed = discord.Embed(title="Sphaghettification Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
+            elif "Shifting" in message:
+                embed = discord.Embed(title="Layer Shifting Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")    
+            elif "Warping" in message:
+                embed = discord.Embed(title="Warping Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
+            else:
+                embed = discord.Embed(title="Stringing Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
         else:
-            embed = discord.Embed(title="Fire Notice", description=message, color=0xFFFF00)
-            embed.set_image(url="attachment://fire_detection.jpg")
+            if "Spaghettification" in message:
+                embed = discord.Embed(title="Sphaghettification Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
+            elif "Shifting" in message:
+                embed = discord.Embed(title="Layer Shifting Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")    
+            elif "Warping" in message:
+                embed = discord.Embed(title="Warping Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
+            else:
+                embed = discord.Embed(title="Stringing Detected", description=message, color=0xFF0000)
+                embed.set_image(url="attachment://error_detection.jpg")
         await channel.send(embed=embed, file=discord_image_file)
         discord_alert_queue.task_done()
 
@@ -85,7 +115,7 @@ def start_discord_bot():
     threading.Thread(target=thread_target, daemon=True).start()
 
 # Open and read txt file, create variable for the contents
-with open("topic_prompts/directive.txt", "r") as file:
+with open("topic_prompts/directive.txt", "r", encoding="utf-8") as file:
     additional_context = file.read()
 
 # Function to extract context from the assistant's response
@@ -94,12 +124,12 @@ def extract_error_alert_from_response(response_text):
 
 # Function to determine the error risk level from the assistant's response
 def determine_error_risk_level(error_alert_context):
-    if "Warning: Spaghettification Detected" in error_alert_context or "Warning: Layer Shifting Detected" in error_alert_context:
-        return "imminent error emergency"
-    elif "Caution: Warping Detected" in error_alert_context:
-        return "high-risk error hazard"
-    elif "Reminder: Stringing Detected" in error_alert_context:
-        return "moderate error hazard"
+    if "High" in error_alert_context:
+        return "High-risk error"
+    elif "Moderate" in error_alert_context:
+        return "Moderate-risk error"
+    elif "Low" in error_alert_context:
+        return "Low-risk error"
     else:
         return "no error hazard"
 
@@ -126,9 +156,9 @@ def process_image():
     image_bytes = base64.b64decode(image_base64)
     image_mem_file = io.BytesIO(image_bytes)
     global discord_image_file
-    discord_image_file = discord.File(fp=image_mem_file, filename="fire_detection.jpg")
+    discord_image_file = discord.File(fp=image_mem_file, filename="error_detection.jpg")
     discord_image_file_embed = discord.Embed(title="Captured Image", description="Image captured from camera feed.")
-    discord_image_file_embed.set_image(url="attachment://fire_detection.jpg")
+    discord_image_file_embed.set_image(url="attachment://error_detection.jpg")
 
     # Construct the messages as per OpenAI's vision API
     messages = [
@@ -166,22 +196,22 @@ def process_image():
         # Store context in the session
         session["error_alert_context"] = error_alert_context
 
-        # Determine the fire risk level
-        risk_level = determine_fire_risk_level(fire_alert_context)
-        print(f"[🔥🔥🔥] Risk level determined: {risk_level}")
+        # Determine the error risk level
+        risk_level = determine_error_risk_level(error_alert_context)
+        print(f"[❗❗❗] Risk level determined: {risk_level}")
 
         # Create discord message
-        if risk_level != "no fire hazard":
-            discord_message = f"Alert: Detected a {risk_level}. Please take necessary precautions."
-            if "imminent" in risk_level:
-                level = "danger"
-            elif "high" in risk_level:
-                level = "warning"
+        if risk_level != "no error hazard":
+            discord_message = f"{error_alert_context}" # Change to AI response
+            if "High" in risk_level:
+                level = "High"
+            elif "Moderate" in risk_level:
+                level = "Moderate"
             else:
-                level = "notice"
+                level = "Low"
             asyncio.run_coroutine_threadsafe(discord_alert_queue.put((discord_message, level)), bot.loop)
 
-        return jsonify({"context": fire_alert_context, "risk_level": risk_level})
+        return jsonify({"context": error_alert_context, "risk_level": risk_level})
 
     except Exception as e:
         app.logger.error(f"An error occurred: {e}")
