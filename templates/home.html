@@ -2,35 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>3DPrintIQ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Link to the updated CSS file -->
+    <title>3DPrintIQ Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
-    <header>
-        <h1>3DPrintIQ</h1>
+    <header class="header">
+        <h1 class="logo">3DPrintIQ</h1>
     </header>
 
-    <main>
-        <section id="monitoring-section">
-            <div id="webcam-container">
-                <video id="camera-feed" autoplay muted playsinline></video>
-                <button id="analyze-button">Emergency Stop</button>
-                <button class="toggle-button" id="myToggleButton">Detect Errors</button>
+    <div class="main-container">
+        <div class="left-section">
+            <div class="camera-container">
+                <video id="camera-feed" autoplay playsinline></video>
+                
+                <div id="status-indicator" class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>MONITORING</span>
+                </div>
+                
+                <div class="camera-controls">
+                    <button id="detect-button" class="btn-detect">Detect Errors</button>
+                    <button id="emergency-button" class="btn-emergency">Emergency Stop</button>
+                </div>
             </div>
-            <div id="logs-container">
-                <h2>Detection Logs</h2>
-                <ul id="context-list"></ul>
+
+            <div class="progress-container">
+                <div class="progress-header">
+                    <span class="progress-label">Print Progress</span>
+                    <span id="progress-percentage" class="progress-percentage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
             </div>
-        </section>
-    </main>
 
-    <footer>
-        <p>&copy; 2025 3DPrintIQ Inc.</p>
-    </footer>
+            <div class="vitals-panel">
+                <h2 class="vitals-title">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Print Vitals
+                </h2>
+                <div class="vitals-grid">
+                    <div class="vital-card">
+                        <div class="vital-header">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span>Time Remaining</span>
+                        </div>
+                        <p id="time-remaining" class="vital-value">2h</p>
+                    </div>
 
-    <!-- Link to the updated JavaScript file -->
+                    <div class="vital-card">
+                        <div class="vital-header">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                            </svg>
+                            <span>Filament Temp</span>
+                        </div>
+                        <p id="filament-temp" class="vital-value">0°C</p>
+                    </div>
+
+                    <div class="vital-card">
+                        <div class="vital-header">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                            </svg>
+                            <span>Bed Temp</span>
+                        </div>
+                        <p id="bed-temp" class="vital-value">0°C</p>
+                    </div>
+
+                    <div class="vital-card">
+                        <div class="vital-header">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                            <span>Current Layer</span>
+                        </div>
+                        <p id="current-layer" class="vital-value">1 / 230</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="log-section">
+            <div class="log-header">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <h2>Detection Log</h2>
+            </div>
+            <div id="detection-log" class="log-content"></div>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
