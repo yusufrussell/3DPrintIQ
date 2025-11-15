@@ -16,6 +16,7 @@ import re
 import requests
 import logging
 from dotenv import load_dotenv
+from flask_socketio import SocketIO, emit
 
 # For Discord bot
 import discord
@@ -30,6 +31,7 @@ from typing import Dict, Any
 discord_alert_queue = asyncio.Queue()
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 # Session configuration
 app.config["SESSION_PERMANENT"] = False
@@ -88,6 +90,9 @@ class Printer():
                 self.cached_json.update(json.loads(response))
                 if prev_layer != self.layer and self.layer != 0:
                     print(f'Next layer: {self.layer}')
+                    socketio.emit("analyze_image", {
+                        "layer": self.layer
+                    })
                 prev_layer = self.layer
                 await asyncio.sleep(1.0)
             except TimeoutError:
@@ -342,6 +347,6 @@ if __name__ == "__main__":
     print(connection_status)
     start_discord_bot()
     try:
-        app.run(debug=True, port=8080)
+        socketio.run(app, debug=True, port=8080)
     finally:
         ws.close() if ws_connected else None
