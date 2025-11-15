@@ -106,20 +106,5 @@
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-    <script>
-        const socket = io("http://127.0.0.1:8080");
-
-
-        // ⭐ When Python tells browser "analyze now"
-        socket.on("analyze_image", (data) => {
-            console.log("Triggered by printer layer:", data.layer);
-
-            // Option 1 — simulate button click (SAFE, guaranteed to work)
-            document.getElementById("analyze-button").click();
-
-            // Option 2 — Direct call if your JS has analyzeImage()
-            // analyzeImage();
-        });
-    </script>
 </body>
 </html>

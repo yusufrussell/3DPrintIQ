@@ -81,22 +81,46 @@ class Printer():
 
     async def update_loop(self):
         global ws_connected
-        prev_layer = 0
+        prev_layer = -1
+    
+        # Make WebSocket non-blocking
+        ws.settimeout(0.05)  
+    
         while ws_connected:
             try:
+                # Always request new info
                 msg = {"id": 1, "method": "printer.info", "params": {}}
                 ws.send(json.dumps(msg))
-                response = ws.recv()
-                self.cached_json.update(json.loads(response))
-                if prev_layer != self.layer and self.layer != 0:
-                    print(f'Next layer: {self.layer}')
-                    socketio.emit("analyze_image", {
-                        "layer": self.layer
-                    })
-                prev_layer = self.layer
-                await asyncio.sleep(1.0)
-            except TimeoutError:
+    
+                latest = None
+    
+                # Drain ALL queued messages, keep only the newest one
+                while True:
+                    try:
+                        raw = ws.recv()
+                        latest = json.loads(raw)
+                    except websocket.WebSocketTimeoutException:
+                        break   # no more data to read
+                    
+                if latest:
+                    self.cached_json.update(latest)
+    
+                    # Emit immediately
+                    socketio.emit("printer_update", self.cached_json)
+    
+                    # Detect layer change
+                    if 'layer' in latest:
+                        layer = latest['layer']
+                        if layer != prev_layer and layer != 0:
+                            socketio.emit("analyze_image", {"layer": layer})
+                            prev_layer = layer
+    
+            except Exception as e:
+                print("update_loop error:", e)
                 ws_connected = False
+    
+            await asyncio.sleep(0.05)  # MUCH faster loop (20 FPS)
+
 
 
     @property
