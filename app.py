@@ -23,6 +23,9 @@ from discord.ext import commands
 import asyncio 
 import threading
 import io
+import websocket
+import json
+from typing import Dict, Any
 
 discord_alert_queue = asyncio.Queue()
 
@@ -45,11 +48,121 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+# WebSocket 3D Printer Connection (Read Only)
+ws = websocket.WebSocket() 
+ws_connected = False
+
+class Printer():
+    def __init__(self, ip, ws_port):
+        self.ip = ip
+        self.ws_port = ws_port
+        self._nozzle_pos = None
+        self._nozzle_temp = None
+        self._bed_temp = None
+        self._layer = None
+        self._time_elapsed = None
+        self._time_remaining = None
+        self._current_file = None
+        self._printing = False
+        self._paused = False
+        self.cached_json = {}
+    
+    def start_connection(self):
+        global ws_connected
+        
+        try:
+            ws.connect(f'ws://{self.ip}:{self.ws_port}')
+            ws_connected = True
+            return "Successfully Connected to 3D Printer"
+        except TimeoutError:
+            return "Printer not active or incorrect IP given"
+
+    async def update_loop(self):
+        global ws_connected
+        prev_layer = 0
+        while ws_connected:
+            try:
+                msg = {"id": 1, "method": "printer.info", "params": {}}
+                ws.send(json.dumps(msg))
+                response = ws.recv()
+                self.cached_json.update(json.loads(response))
+                if prev_layer != self.layer and self.layer != 0:
+                    print(f'Next layer: {self.layer}')
+                prev_layer = self.layer
+                await asyncio.sleep(1.0)
+            except TimeoutError:
+                ws_connected = False
+
+
+    @property
+    def info_json(self):
+        return self.cached_json
+    
+    @property
+    def nozzle_pos(self):
+        return self.cached_json.get('curPosition')
+        
+    @property
+    def nozzle_temp(self):
+        return self.cached_json.get('nozzleTemp')
+
+    @property
+    def bed_temp(self):
+        return self.cached_json.get('bedTemp0')
+
+    @property
+    def layer(self):
+        return self.cached_json.get('layer')
+
+    @property
+    def time_elapsed(self):
+        return self.cached_json.get('printJobTime')
+
+    @property
+    def time_remaining(self):
+        return self.cached_json.get('printLeftTime')
+
+    @property
+    def current_file(self):
+        return self.cached_json.get('printFileName')
+
+    @property
+    def printing(self):
+        return True if self.cached_json.get('deviceState') == 1 else False
+
+    @property
+    def paused(self):
+        return True if self.cached_json.get('state') == 5 else False
+    
+    @property
+    def flow(self):
+        return self.cached_json.get('realTimeFlow')
+    
+    @property
+    def speed(self):
+        return self.cached_json.get('realTimeSpeed')
+
+
+printer_ip = '192.168.1.130'
+printer_ws_port = '9999'
+
+printer = Printer(printer_ip, printer_ws_port)
+
 # Bot setup
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.name})")
     bot.loop.create_task(discord_alert())
+    
+    bot.loop.create_task(printer.update_loop())
+
+    # Debug Printer Info
+    # bot.loop.create_task(debug_printer_monitor())
+
+# async def debug_printer_monitor():
+#     while True:
+#         print("[LIVE]", printer.nozzle_pos, printer.nozzle_temp, printer.bed_temp, printer.layer)
+#         await asyncio.sleep(1)
 
 # Create Discord alert
 async def discord_alert():
@@ -225,5 +338,10 @@ def clear_session():
     return jsonify({"status": "session cleared"})
 
 if __name__ == "__main__":
+    connection_status = printer.start_connection()
+    print(connection_status)
     start_discord_bot()
-    app.run(debug=True, port=8080)
+    try:
+        app.run(debug=True, port=8080)
+    finally:
+        ws.close() if ws_connected else None
