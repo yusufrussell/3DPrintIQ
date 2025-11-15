@@ -7,10 +7,12 @@ openai>=1.30.0
 
 # HTTP + SMS
 requests>=2.32.0
-twilio>=9.1.0
 
 # Env vars (recommended even if you currently hardcode keys)
 python-dotenv>=1.0.1
+
+#Discord bot
+discord.py
 
 # (Optional) Production server for deploys (not needed for local dev)
 # gunicorn>=21.2.0
